@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PQRS - Panel Administrador</title>
+    <style>
+        :root {
+            --color-primary: #f99aaa;
+            --color-white: #ffffff;
+            --color-light-gray: #f5f5f5;
+            --color-black: #000000;
+            --color-dark-gray: #777;
+            --color-pqrs-p: #e8f5e9;
+            --color-pqrs-q: #fff3e0;
+            --color-pqrs-r: #ffebee;
+            --color-border: #e0e0e0;
+            --color-hover: #f1f3f4;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--color-light-gray);
+            color: var(--color-black);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Encabezado original */
+        .top-bar {
+            background-color: var(--color-black);
+            color: var(--color-white);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .showpass {
+            font-weight: bold;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+        }
+        
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-icon {
+            width: 45px;
+            height: 45px;
+            background-color: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            font-size: 20px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+        
+        .profile-icon {
+            width: 45px;
+            height: 45px;
+            background-color: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--color-dark-gray);
+            padding: 0 25px;
+        }
+        
+        .breadcrumb a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Layout principal */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 0 25px;
+        }
+        
+        /* Sidebar estilo Gmail */
+        .gmail-sidebar {
+            width: 256px;
+            background-color: var(--color-white);
+            padding: 16px 0;
+            border-right: 1px solid var(--color-border);
+            overflow-y: auto;
+            margin-right: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 8px 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            height: 32px;
+            padding: 0 12px 0 26px;
+            margin: 0 8px;
+            border-radius: 0 16px 16px 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #202124;
+            transition: background-color 0.2s;
+        }
+        
+        .menu-item.active {
+            background-color: #feefc3;
+            font-weight: 600;
+        }
+        
+        .menu-item:hover:not(.active) {
+            background-color: #eaebef;
+        }
+        
+        .menu-icon {
+            margin-right: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Contenido principal estilo Gmail */
+        .gmail-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--color-white);
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .content-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            height: 56px;
+            border-bottom: 1px solid var(--color-border);
+            background-color: var(--color-white);
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .checkbox-container {
+            margin-right: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .action-icon:hover {
+            background-color: var(--color-light-gray);
+        }
+        
+        .pagination {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #5f6368;
+        }
+        
+        /* Lista de elementos PQRS */
+        .pqrs-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .pqrs-item {
+            display: flex;
+            align-items: center;
+            height: 40px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--color-border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .pqrs-item:hover {
+            background-color: var(--color-hover);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pqrs-item.unread {
+            background-color: #f2f6fc;
+            font-weight: 600;
+        }
+        
+        .pqrs-checkbox {
+            margin-right: 16px;
+        }
+        
+        .star-icon {
+            margin-right: 16px;
+            color: #5f6368;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .star-icon.starred {
+            color: #f2c960;
+        }
+        
+        .pqrs-type {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 16px;
+        }
+        
+        .pqrs-p {
+            background-color: var(--color-pqrs-p);
+            color: #2e7d32;
+        }
+        
+        .pqrs-q {
+            background-color: var(--color-pqrs-q);
+            color: #ef6c00;
+        }
+        
+        .pqrs-r {
+            background-color: var(--color-pqrs-r);
+            color: #c62828;
+        }
+        
+        .pqrs-sender {
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 150px;
+            margin-right: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .pqrs-subject {
+            font-size: 14px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 16px;
+        }
+        
+        .pqrs-time {
+            font-size: 12px;
+            color: #5f6368;
+            text-align: right;
+            min-width: 60px;
+        }
+        
+        /* Modal de mensaje */
+        .message-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .message-content {
+            background-color: white;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+        }
+        
+        .message-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+        
+        .message-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #202124;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #5f6368;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .close-btn:hover {
+            background-color: #f1f3f4;
+        }
+        
+        .message-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .message-meta {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .message-type {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        
+        .message-date {
+            color: #5f6368;
+            margin-left: auto;
+        }
+        
+        .message-text {
+            line-height: 1.6;
+            color: #202124;
+            white-space: pre-line;
+        }
+        
+        .message-actions {
+            padding: 16px 24px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            gap: 12px;
+            background-color: #f9f9f9;
+        }
+        
+        .msg-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #dadce0;
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .msg-btn:hover {
+            background-color: #f1f3f4;
+        }
+        
+        .msg-btn.primary {
+            background-color: var(--color-primary);
+            color: black;
+            border: none;
+        }
+        
+        .msg-btn.primary:hover {
+            background-color: #f88a9d;
+        }
+        
+        /* Formulario de respuesta */
+        .reply-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .reply-form textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+        
+        .reply-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        /* Footer original */
+        footer {
+            background-color: var(--color-primary);
+            padding: 40px 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .social-section {
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        
+        .social-section h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--color-black);
+            border-bottom: 3px solid var(--color-black);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        
+        .social-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--color-black);
+            text-decoration: none;
+            padding: 20px;
+            background-color: var(--color-white);
+            border-radius: 10px;
+            transition: transform 0.3s, background-color 0.3s;
+            min-width: 140px;
+        }
+        
+        .social-link:hover {
+            background-color: var(--color-light-gray);
+            transform: translateY(-5px);
+        }
+        
+        .social-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+        
+        .copyright {
+            color: var(--color-black);
+            font-weight: 500;
+            border-top: 2px solid var(--color-black);
+            padding-top: 25px;
+            width: 100%;
+            font-size: 18px;
+        }
+        
+        @media (max-width: 968px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .gmail-sidebar {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+            
+            .message-content {
+                width: 95%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .gmail-sidebar {
+                width: 100%;
+            }
+            
+            .menu-item span {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 0;
+                margin: 8px auto;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+            }
+            
+            .menu-icon {
+                margin-right: 0;
+            }
+            
+            .pqrs-sender {
+                min-width: 120px;
+            }
+            
+            .top-bar {
+                padding: 15px 20px;
+            }
+            
+            .breadcrumb {
+                padding: 0 20px;
+            }
+            
+            .main-container {
+                padding: 0 20px;
+            }
+            
+            footer {
+                padding: 30px 20px;
+            }
+            
+            .social-links {
+                gap: 15px;
+            }
+            
+            .social-link {
+                min-width: 120px;
+                padding: 15px;
+            }
+            
+            .message-meta {
+                flex-direction: column;
+            }
+            
+            .message-date {
+                margin-left: 0;
+                margin-top: 8px;
+            }
+            
+            .message-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado original -->
+    <div class="top-bar">
+        <div class="showpass">SHOWPASS</div>
+        <div class="profile-section">
+            <div class="notification-icon">
+                🔔
+                <div class="notification-badge">3</div>
+            </div>
+            <div class="profile">
+                <div class="profile-icon">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="breadcrumb">
+        <a href="Apanel.html">Panel de control</a> > PQRS
+    </div>
+    
+    <!-- Layout principal -->
+    <div class="main-container">
+        <!-- Sidebar estilo Gmail -->
+        <div class="gmail-sidebar">
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <span class="menu-icon">📥</span>
+                    <span>Principal</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">⭐</span>
+                    <span>Destacados</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">🕒</span>
+                    <span>Pendientes</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="gmail-content">
+            <div class="content-header">
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                </div>
+                <div class="action-buttons">
+                    <div class="action-icon">↻</div>
+                </div>
+                <div class="pagination">
+                    1-7 de 7
+                </div>
+            </div>
+            
+            <!-- Lista de PQRS -->
+            <div class="pqrs-list">
+                <div class="pqrs-item unread" data-id="1">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-q">Q</div>
+                    <div class="pqrs-sender">Q1- Carlos Mendoza</div>
+                    <div class="pqrs-subject">Solicitud de información sobre horarios</div>
+                    <div class="pqrs-time">12:45</div>
+                </div>
+                
+                <div class="pqrs-item" data-id="2">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-p">P</div>
+                    <div class="pqrs-sender">P1- Ana Rodríguez</div>
+                    <div class="pqrs-subject">Petición para agregar más funciones los fines de semana</div>
+                    <div class="pqrs-time">11:30</div>
+                </div>
+                
+                <div class="pqrs-item unread" data-id="3">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-r">R</div>
+                    <div class="pqrs-sender">R1- María González</div>
+                    <div class="pqrs-subject">Reclamo por boletas no entregadas correctamente</div>
+                    <div class="pqrs-time">Ayer</div>
+                </div>
+                
+                <div class="pqrs-item" data-id="4">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-r">R</div>
+                    <div class="pqrs-sender">R2- Roberto Díaz</div>
+                    <div class="pqrs-subject">Reclamo por error en el cobro de boletas VIP</div>
+                    <div class="pqrs-time">Ayer</div>
+                </div>
+                
+                <div class="pqrs-item unread" data-id="5">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-q">Q</div>
+                    <div class="pqrs-sender">Q2- Laura Sánchez</div>
+                    <div class="pqrs-subject">Queja por el estado de las instalaciones</div>
+                    <div class="pqrs-time">15 Oct</div>
+                </div>
+                
+                <div class="pqrs-item" data-id="6">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-p">P</div>
+                    <div class="pqrs-sender">P2- Javier López</div>
+                    <div class="pqrs-subject">Petición para agregar más funciones los fines de semana</div>
+                    <div class="pqrs-time">14 Oct</div>
+                </div>
+                
+                <div class="pqrs-item" data-id="7">
+                    <div class="pqrs-checkbox">
+                        <input type="checkbox">
+                    </div>
+                    <div class="star-icon">☆</div>
+                    <div class="pqrs-type pqrs-p">P</div>
+                    <div class="pqrs-sender">P3- Pedro Martínez</div>
+                    <div class="pqrs-subject">Solicitud de descuento para grupos grandes</div>
+                    <div class="pqrs-time">12 Oct</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de mensaje -->
+    <div class="message-modal" id="messageModal">
+        <div class="message-content">
+            <div class="message-header">
+                <div class="message-title" id="messageTitle">Asunto del mensaje</div>
+                <button class="close-btn" id="closeModal">×</button>
+            </div>
+            <div class="message-body" id="messageBody">
+                <div class="message-meta">
+                    <div class="message-type pqrs-q" id="messageType">Q</div>
+                    <div class="message-sender" id="messageSender">Remitente</div>
+                    <div class="message-date" id="messageDate">Fecha</div>
+                </div>
+                <div class="message-text" id="messageText">
+                    <!-- Contenido del mensaje se insertará aquí -->
+                </div>
+                
+                <!-- Formulario de respuesta -->
+                <div class="reply-form" id="replyForm">
+                    <textarea placeholder="Escribe tu respuesta aquí..." id="replyText"></textarea>
+                    <div class="reply-buttons">
+                        <button class="msg-btn" id="cancelReply">Cancelar</button>
+                        <button class="msg-btn primary" id="sendReply">Enviar respuesta</button>
+                    </div>
+                </div>
+            </div>
+            <div class="message-actions">
+                <button class="msg-btn" id="replyBtn">Responder</button>
+                <button class="msg-btn primary" id="resolveBtn">Marcar como resuelto</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer original -->
+    <footer>
+        <div class="footer-content">
+            <div class="copyright">
+                <p>&copy; 2025 Circo Real de México. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Datos de ejemplo para los mensajes
+        const messages = {
+            1: {
+                type: "q",
+                sender: "Q1- Carlos Mendoza",
+                date: "Hoy a las 12:45",
+                subject: "Solicitud de información sobre horarios",
+                text: "Buenos días,\n\nMe dirijo a ustedes para solicitar información sobre los horarios de las funciones especiales de fin de semana. He intentado encontrar esta información en su sitio web pero no la encuentro actualizada.\n\n¿Podrían proporcionarme los horarios para el próximo fin de semana? También me gustaría saber si hay descuentos disponibles para grupos familiares.\n\nQuedo atento a su respuesta.\n\nSaludos cordiales,\nCarlos Mendoza"
+            },
+            2: {
+                type: "p",
+                sender: "P1- Ana Rodríguez",
+                date: "Hoy a las 11:30",
+                subject: "Petición para agregar más funciones los fines de semana",
+                text: "Estimados,\n\nMe encanta su circo y he asistido varias veces con mi familia. Sin embargo, he notado que los fines de semana hay menos funciones que entre semana.\n\nMe gustaría pedirles que consideren agregar más funciones los sábados y domingos, ya que es cuando la mayoría de las familias podemos asistir.\n\nEstoy segura de que esto aumentaría la asistencia y mejoraría la experiencia de sus clientes.\n\nGracias por considerar mi petición.\n\nAtentamente,\nAna Rodríguez"
+            },
+            3: {
+                type: "r",
+                sender: "R1- María González",
+                date: "Ayer a las 16:20",
+                subject: "Reclamo por boletas no entregadas correctamente",
+                text: "Buen día,\n\nEl pasado sábado compré 4 boletas para la función de las 5:00 PM a través de su sitio web. Realicé el pago exitosamente y recibí el correo de confirmación, pero al llegar al circo, el personal no pudo encontrar mi reserva en el sistema.\n\nDespués de 30 minutos de espera y de mostrarles el comprobante de pago, finalmente nos permitieron entrar pero nos asignaron asientos de menor calidad que los que había comprado originalmente.\n\nSolicito por favor que me reembolsen la diferencia de precio o me concedan boletas para otra función con los asientos que originalmente compré.\n\nQuedo a la espera de su respuesta.\n\nMaría González"
+            },
+            4: {
+                type: "r",
+                sender: "R2- Roberto Díaz",
+                date: "Ayer a las 14:15",
+                subject: "Reclamo por error en el cobro de boletas VIP",
+                text: "Estimado equipo de atención al cliente,\n\nEl día de ayer adquirí 2 boletas VIP para la función de gala through su aplicación móvil. Sin embargo, al revisar mi estado de cuenta, noté que se me cobró el precio completo 3 veces en lugar de una.\n\nHe intentado contactar por teléfono pero las líneas están congestionadas. Adjunto capturas de pantalla del cobro múltiple y de mi compra.\n\nSolicito que se reversen los cargos duplicados lo antes posible y se me informe por correo electrónico cuando se haya solucionado este problema.\n\nAgradezco su pronta atención a este asunto.\n\nRoberto Díaz"
+            },
+            5: {
+                type: "q",
+                sender: "Q2- Laura Sánchez",
+                date: "15 Oct, 2023",
+                subject: "Queja por el estado de las instalaciones",
+                text: "Buenas tardes,\n\nVisité su circo el pasado fin de semana y debo expresar mi preocupación por el estado de las instalaciones. Los baños estaban sucios, algunas butacas estaban rotas y había olores desagradables en la zona de comida.\n\nEs una lástima porque el espectáculo en sí era muy bueno, pero la experiencia general se vio empañada por estas condiciones.\n\nEspero que tomen medidas para mejorar el mantenimiento de las instalaciones, ya que esto afecta directamente la experiencia del cliente.\n\nLaura Sánchez"
+            },
+            6: {
+                type: "p",
+                sender: "P2- Javier López",
+                date: "14 Oct, 2023",
+                subject: "Petición para agregar más funciones los fines de semana",
+                text: "Hola,\n\nSoy fanático de su circo y he notado que cada vez es más difícil conseguir boletos para los fines de semana porque hay menos funciones.\n\nMe gustaría sugerir que agreguen más horarios los sábados y domingos, especialmente por las tardes que es cuando la mayoría de las familias podemos asistir.\n\nEstoy seguro de que hay suficiente demanda para justificar funciones adicionales.\n\nGracias por considerar mi sugerencia.\n\nJavier López"
+            },
+            7: {
+                type: "p",
+                sender: "P3- Pedro Martínez",
+                date: "12 Oct, 2023",
+                subject: "Solicitud de descuento para grupos grandes",
+                text: "Estimados,\n\nRepresento a una empresa que desea organizar una salida grupal para 50 empleados. Nos interesa asistir a su espectáculo pero nos gustaría saber si ofrecen descuentos por grupo.\n\nTambién necesitaríamos información sobre:\n- Precios especiales para grupos\n- Disponibilidad para el último fin de semana de noviembre\n- Opciones de catering o combos de comida\n- Facilidades de estacionamiento para grupos\n\nAgradecería si me pueden enviar esta información para presentarla a la dirección de mi empresa.\n\nPedro Martínez\nCoordinador de Eventos"
+            }
+        };
+
+        // Estado de la aplicación
+        let currentMessageId = null;
+        let replyFormVisible = false;
+
+        // Funcionalidad para las estrellas
+        document.querySelectorAll('.star-icon').forEach(star => {
+            star.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('starred');
+                this.textContent = this.classList.contains('starred') ? '⭐' : '☆';
+                
+                // Actualizar estado en la lista de mensajes
+                const messageId = this.closest('.pqrs-item').getAttribute('data-id');
+                const messageElement = document.querySelector(`.pqrs-item[data-id="${messageId}"]`);
+                
+                if (this.classList.contains('starred')) {
+                    // Mover a destacados visualmente (cambiar color de fondo)
+                    messageElement.style.backgroundColor = '#fff8e1';
+                } else {
+                    // Quitar de destacados
+                    if (!messageElement.classList.contains('unread')) {
+                        messageElement.style.backgroundColor = '';
+                    }
+                }
+            });
+        });
+        
+        // Funcionalidad para abrir mensajes
+        document.querySelectorAll('.pqrs-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.type !== 'checkbox' && !e.target.classList.contains('star-icon')) {
+                    const messageId = this.getAttribute('data-id');
+                    openMessage(messageId);
+                    
+                    // Marcar como leído
+                    this.classList.remove('unread');
+                    this.style.backgroundColor = '';
+                }
+            });
+        });
+        
+        // Funcionalidad para el botón de actualizar
+        document.querySelector('.action-icon').addEventListener('click', function() {
+            alert('Actualizando lista de PQRS...');
+            // En una aplicación real, aquí se recargarían los datos
+        });
+        
+        // Funcionalidad para el modal
+        const modal = document.getElementById('messageModal');
+        const closeModal = document.getElementById('closeModal');
+        const replyBtn = document.getElementById('replyBtn');
+        const resolveBtn = document.getElementById('resolveBtn');
+        const replyForm = document.getElementById('replyForm');
+        const cancelReply = document.getElementById('cancelReply');
+        const sendReply = document.getElementById('sendReply');
+        const replyText = document.getElementById('replyText');
+        
+        closeModal.addEventListener('click', function() {
+            closeMessageModal();
+        });
+        
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeMessageModal();
+            }
+        });
+        
+        // Botón de responder
+        replyBtn.addEventListener('click', function() {
+            toggleReplyForm();
+        });
+        
+        // Botón de cancelar respuesta
+        cancelReply.addEventListener('click', function() {
+            toggleReplyForm(false);
+        });
+        
+        // Botón de enviar respuesta
+        sendReply.addEventListener('click', function() {
+            if (replyText.value.trim() === '') {
+                alert('Por favor, escribe una respuesta antes de enviar.');
+                return;
+            }
+            
+            // En una aplicación real, aquí se enviaría la respuesta al servidor
+            alert('Respuesta enviada correctamente.');
+            
+            // Limpiar y ocultar formulario
+            replyText.value = '';
+            toggleReplyForm(false);
+            
+            // Marcar como resuelto automáticamente después de responder
+            resolveMessage();
+        });
+        
+        // Botón de marcar como resuelto
+        resolveBtn.addEventListener('click', function() {
+            resolveMessage();
+        });
+        
+        // Función para abrir un mensaje
+        function openMessage(id) {
+            const message = messages[id];
+            if (!message) return;
+            
+            currentMessageId = id;
+            
+            // Configurar el modal con los datos del mensaje
+            document.getElementById('messageTitle').textContent = message.subject;
+            document.getElementById('messageSender').textContent = message.sender;
+            document.getElementById('messageDate').textContent = message.date;
+            document.getElementById('messageText').textContent = message.text;
+            
+            // Configurar el tipo de mensaje
+            const typeElement = document.getElementById('messageType');
+            typeElement.textContent = message.type.toUpperCase();
+            typeElement.className = 'message-type';
+            typeElement.classList.add('pqrs-' + message.type);
+            
+            // Ocultar formulario de respuesta al abrir un mensaje
+            toggleReplyForm(false);
+            
+            // Mostrar el modal
+            modal.style.display = 'flex';
+        }
+        
+        // Función para cerrar el modal
+        function closeMessageModal() {
+            modal.style.display = 'none';
+            currentMessageId = null;
+        }
+        
+        // Función para mostrar/ocultar el formulario de respuesta
+        function toggleReplyForm(show) {
+            replyFormVisible = show !== undefined ? show : !replyFormVisible;
+            replyForm.style.display = replyFormVisible ? 'block' : 'none';
+            
+            // Cambiar texto del botón según el estado
+            replyBtn.textContent = replyFormVisible ? 'Ocultar respuesta' : 'Responder';
+        }
+        
+        // Función para marcar como resuelto
+        function resolveMessage() {
+            if (!currentMessageId) return;
+            
+            // En una aplicación real, aquí se actualizaría el estado en el servidor
+            alert(`PQRS ${currentMessageId} marcado como resuelto.`);
+            
+            // Actualizar interfaz
+            const messageElement = document.querySelector(`.pqrs-item[data-id="${currentMessageId}"]`);
+            if (messageElement) {
+                messageElement.style.textDecoration = 'line-through';
+                messageElement.style.opacity = '0.7';
+            }
+            
+            // Cerrar modal
+            closeMessageModal();
+        }
+    </script>
+</body>
+</html>
